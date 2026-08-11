@@ -1,2 +1,2 @@
 # Projeto Final
-Todos os conteúdos do  nosso último projeto seraõ encontrados aqui 
+Todos os conteúdos do  nosso último projeto serão encontrados aqui 
