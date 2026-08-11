@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Controle de Clientes e Pedidos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        header h1 {
+            color: #1a1a1a;
+            font-size: 2.5em;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .container {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tabs button {
+            padding: 12px 24px;
+            background-color: #333;
+            border: 2px solid #FFD700;
+            color: #FFD700;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .nav-tabs button:hover,
+        .nav-tabs button.active {
+            background-color: #FFD700;
+            color: #1a1a1a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #FFD700;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            color: #ffffff;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        button[type="submit"],
+        .btn-primary {
+            padding: 12px 24px;
+            background-color: #FFD700;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button[type="submit"]:hover,
+        .btn-primary:hover {
+            background-color: #FFA500;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-danger {
+            padding: 8px 16px;
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background-color: #cc0000;
+            transform: translateY(-2px);
+        }
+
+        .btn-edit {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-right: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit:hover {
+            background-color: #45a049;
+        }
+
+        .btn-secondary {
+            padding: 8px 16px;
+            background-color: #0099cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-right: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: #0077aa;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #2a2a2a;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        thead {
+            background-color: #FFD700;
+            color: #1a1a1a;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #444;
+        }
+
+        tbody tr:hover {
+            background-color: #333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            animation: slideIn 0.3s ease-in;
+        }
+
+        .alert-success {
+            background-color: #4CAF50;
+            color: white;
+            border-left: 4px solid #45a049;
+        }
+
+        .alert-error {
+            background-color: #ff4444;
+            color: white;
+            border-left: 4px solid #cc0000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        .status-pendente {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .status-confirmado {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .status-entregue {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .status-cancelado {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-content {
+            background-color: #2a2a2a;
+            margin: 10% auto;
+            padding: 30px;
+            border: 1px solid #FFD700;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #FFD700;
+            padding-bottom: 10px;
+        }
+
+        .modal-header h2 {
+            color: #FFD700;
+        }
+
+        .close {
+            color: #FFD700;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #FFA500;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #FFD700;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard-card h3 {
+            color: #FFD700;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .dashboard-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #FFA500;
+        }
+
+        .form-section {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid #444;
+        }
+
+        .form-section h3 {
+            color: #FFD700;
+            margin-bottom: 20px;
+        }
+
+        footer {
+            background-color: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+            border-top: 2px solid #FFD700;
+            color: #888;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📦 Sistema de Controle de Clientes e Pedidos</h1>
+        <p>Gerenciamento completo de clientes, produtos e pedidos</p>
+    </header>
+
+    <div class="container">
+        <!-- Botões de Navegação -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="abrirAba('dashboard')">📊 Dashboard</button>
+            <button class="tab-btn" onclick="abrirAba('clientes')">👥 Clientes</button>
+            <button class="tab-btn" onclick="abrirAba('produtos')">📦 Produtos</button>
+            <button class="tab-btn" onclick="abrirAba('categorias')">🏷️ Categorias</button>
+            <button class="tab-btn" onclick="abrirAba('pedidos')">🛒 Pedidos</button>
+            <button class="tab-btn" onclick="abrirAba('relatorios')">📈 Relatórios</button>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="section active">
+            <h2>📊 Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h3>👥 Total de Clientes</h3>
+                    <div class="value" id="total-clientes">0</div>
+                </div>
+                <div class="dashboard-card">
+                    <h3>📦 Total de Produtos</h3>
+                    <div class="value" id="total-produtos">0</div>
+                </div>
+                <div class="dashboard-card">
+                    <h3>🛒 Total de Pedidos</h3>
+                    <div class="value" id="total-pedidos">0</div>
+                </div>
+                <div class="dashboard-card">
+                    <h3>💰 Valor Total de Vendas</h3>
+                    <div class="value" id="valor-total-vendas">R$ 0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CLIENTES -->
+        <div id="clientes" class="section">
+            <h2>👥 Gestão de Clientes</h2>
+            <div id="alert-cliente"></div>
+
+            <div class="form-section">
+                <h3>Adicionar Novo Cliente</h3>
+                <form id="form-cliente">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nome *</label>
+                            <input type="text" id="cliente-nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="cliente-email" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Telefone</label>
+                            <input type="tel" id="cliente-telefone">
+                        </div>
+                        <div class="form-group">
+                            <label>CPF/CNPJ</label>
+                            <input type="text" id="cliente-cpf">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Endereço</label>
+                        <input type="text" id="cliente-endereco">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cidade</label>
+                            <input type="text" id="cliente-cidade">
+                        </div>
+                        <div class="form-group">
+                            <label>Estado</label>
+                            <input type="text" id="cliente-estado" maxlength="2">
+                        </div>
+                        <div class="form-group">
+                            <label>CEP</label>
+                            <input type="text" id="cliente-cep">
+                        </div>
+                    </div>
+                    <button type="submit">✅ Adicionar Cliente</button>
+                </form>
+            </div>
+
+            <table id="tabela-clientes">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>Cidade</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- PRODUTOS -->
+        <div id="produtos" class="section">
+            <h2>📦 Gestão de Produtos</h2>
+            <div id="alert-produto"></div>
+
+            <div class="form-section">
+                <h3>Adicionar Novo Produto</h3>
+                <form id="form-produto">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nome *</label>
+                            <input type="text" id="produto-nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Categoria *</label>
+                            <select id="produto-categoria" required>
+                                <option value="">Selecionar categoria...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Preço *</label>
+                            <input type="number" id="produto-preco" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Quantidade em Estoque *</label>
+                            <input type="number" id="produto-estoque" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição</label>
+                        <textarea id="produto-descricao" rows="3"></textarea>
+                    </div>
+                    <button type="submit">✅ Adicionar Produto</button>
+                </form>
+            </div>
+
+            <table id="tabela-produtos">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Categoria</th>
+                        <th>Preço</th>
+                        <th>Estoque</th>
+                        <th>Data Criação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- CATEGORIAS -->
+        <div id="categorias" class="section">
+            <h2>🏷️ Gestão de Categorias</h2>
+            <div id="alert-categoria"></div>
+
+            <div class="form-section">
+                <h3>Adicionar Nova Categoria</h3>
+                <form id="form-categoria">
+                    <div class="form-group">
+                        <label>Nome *</label>
+                        <input type="text" id="categoria-nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição</label>
+                        <textarea id="categoria-descricao" rows="3"></textarea>
+                    </div>
+                    <button type="submit">✅ Adicionar Categoria</button>
+                </form>
+            </div>
+
+            <table id="tabela-categorias">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Data Criação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- PEDIDOS -->
+        <div id="pedidos" class="section">
+            <h2>🛒 Gestão de Pedidos</h2>
+            <div id="alert-pedido"></div>
+
+            <div class="form-section">
+                <h3>Criar Novo Pedido</h3>
+                <form id="form-pedido">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cliente *</label>
+                            <select id="pedido-cliente" required>
+                                <option value="">Selecionar cliente...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status *</label>
+                            <select id="pedido-status" required>
+                                <option value="Pendente">Pendente</option>
+                                <option value="Confirmado">Confirmado</option>
+                                <option value="Entregue">Entregue</option>
+                                <option value="Cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Observações</label>
+                        <textarea id="pedido-observacoes" rows="3"></textarea>
+                    </div>
+                    <button type="submit">✅ Criar Pedido</button>
+                </form>
+            </div>
+
+            <table id="tabela-pedidos">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Data do Pedido</th>
+                        <th>Status</th>
+                        <th>Valor Total</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- RELATÓRIOS -->
+        <div id="relatorios" class="section">
+            <h2>📈 Relatórios</h2>
+
+            <div class="form-section">
+                <h3>Gerar Relatórios</h3>
+                <button class="btn-primary" onclick="gerarRelatorioEstoque()">📊 Relatório de Estoque</button>
+                <button class="btn-primary" onclick="gerarRelatorioVendas()">💰 Relatório de Vendas</button>
+            </div>
+
+            <h3>Estoque de Produtos</h3>
+            <table id="tabela-relatorio-estoque" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Categoria</th>
+                        <th>Quantidade em Estoque</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <h3 style="margin-top: 30px;">Vendas por Data</h3>
+            <table id="tabela-relatorio-vendas" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Total de Pedidos</th>
+                        <th>Valor Total</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para Editar Cliente -->
+    <div id="modal-editar-cliente" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Cliente</h2>
+                <span class="close" onclick="fecharModal('modal-editar-cliente')">&times;</span>
+            </div>
+            <form id="form-editar-cliente">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome *</label>
+                        <input type="text" id="edit-cliente-nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="edit-cliente-email" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="tel" id="edit-cliente-telefone">
+                    </div>
+                    <div class="form-group">
+                        <label>Endereço</label>
+                        <input type="text" id="edit-cliente-endereco">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cidade</label>
+                        <input type="text" id="edit-cliente-cidade">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <input type="text" id="edit-cliente-estado" maxlength="2">
+                    </div>
+                    <div class="form-group">
+                        <label>CEP</label>
+                        <input type="text" id="edit-cliente-cep">
+                    </div>
+                </div>
+                <button type="submit">💾 Salvar Alterações</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Ver Detalhes do Pedido -->
+    <div id="modal-detalhes-pedido" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes do Pedido</h2>
+                <span class="close" onclick="fecharModal('modal-detalhes-pedido')">&times;</span>
+            </div>
+            <div id="detalhes-pedido-content"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Sistema de Controle de Pedidos | Desenvolvido com ❤️</p>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let clienteEmEdicao = null;
+
+        // ========== FUNÇÕES GERAIS ==========
+        function abrirAba(abaPara) {
+            const abas = document.querySelectorAll('.section');
+            const botoes = document.querySelectorAll('.tab-btn');
+
+            abas.forEach(aba => aba.classList.remove('active'));
+            botoes.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(abaPara).classList.add('active');
+            event.target.classList.add('active');
+
+            // Carregar dados quando abrir cada aba
+            if (abaPara === 'clientes') carregarClientes();
+            if (abaPara === 'produtos') carregarProdutos();
+            if (abaPara === 'categorias') carregarCategorias();
+            if (abaPara === 'pedidos') carregarPedidos();
+        }
+
+        function mostrarAlerta(mensagem, tipo, elementoId) {
+            const elemento = document.getElementById(elementoId);
+            elemento.innerHTML = `<div class="alert alert-${tipo}">${mensagem}</div>`;
+            setTimeout(() => {
+                elemento.innerHTML = '';
+            }, 3000);
+        }
+
+        function abrirModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function fecharModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+            }
+        }
+
+        async function carregarDashboard() {
+            try {
+                const clientes = await fetch(`${API_URL}/clientes`).then(r => r.json());
+                const produtos = await fetch(`${API_URL}/produtos`).then(r => r.json());
+                const pedidos = await fetch(`${API_URL}/pedidos`).then(r => r.json());
+
+                document.getElementById('total-clientes').textContent = clientes.length;
+                document.getElementById('total-produtos').textContent = produtos.length;
+                document.getElementById('total-pedidos').textContent = pedidos.length;
+
+                const valorTotal = pedidos.reduce((sum, pedido) => sum + (parseFloat(pedido.valor_total) || 0), 0);
+                document.getElementById('valor-total-vendas').textContent = `R$ ${valorTotal.toFixed(2)}`;
+            } catch (error) {
+                console.error('Erro ao carregar dashboard:', error);
+            }
+        }
+
+        // ========== CLIENTES ==========
+        async function carregarClientes() {
+            try {
+                const response = await fetch(`${API_URL}/clientes`);
+                const clientes = await response.json();
+                const tbody = document.querySelector('#tabela-clientes tbody');
+
+                if (clientes.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Nenhum cliente cadastrado</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = clientes.map(cliente => `
+                    <tr>
+                        <td>${cliente.id}</td>
+                        <td>${cliente.nome}</td>
+                        <td>${cliente.email}</td>
+                        <td>${cliente.telefone || 'N/A'}</td>
+                        <td>${cliente.cidade || 'N/A'}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editarCliente(${cliente.id})">✏️ Editar</button>
+                            <button class="btn-danger" onclick="deletarCliente(${cliente.id})">🗑️ Deletar</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Erro ao carregar clientes:', error);
+            }
+        }
+
+        document.getElementById('form-cliente').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const cliente = {
+                nome: document.getElementById('cliente-nome').value,
+                email: document.getElementById('cliente-email').value,
+                telefone: document.getElementById('cliente-telefone').value,
+                endereco: document.getElementById('cliente-endereco').value,
+                cidade: document.getElementById('cliente-cidade').value,
+                estado: document.getElementById('cliente-estado').value,
+                cep: document.getElementById('cliente-cep').value,
+                cpf_cnpj: document.getElementById('cliente-cpf').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/clientes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(cliente)
+                });
+
+                if (response.ok) {
+                    mostrarAlerta('✓ Cliente adicionado com sucesso!', 'success', 'alert-cliente');
+                    document.getElementById('form-cliente').reset();
+                    carregarClientes();
+                    carregarDashboard();
+                } else {
+                    mostrarAlerta('✗ Erro ao adicionar cliente', 'error', 'alert-cliente');
+                }
+            } catch (error) {
+                mostrarAlerta('✗ Erro ao conectar com servidor', 'error', 'alert-cliente');
+            }
+        });
+
+        async function editarCliente(id) {
+            try {
+                const response = await fetch(`${API_URL}/clientes/${id}`);
+                const cliente = await response.json();
+
+                clienteEmEdicao = id;
+                document.getElementById('edit-cliente-nome').value = cliente.nome;
+                document.getElementById('edit-cliente-email').value = cliente.email;
+                document.getElementById('edit-cliente-telefone').value = cliente.telefone || '';
+                document.getElementById('edit-cliente-endereco').value = cliente.endereco || '';
+                document.getElementById('edit-cliente-cidade').value = cliente.cidade || '';
+                document.getElementById('edit-cliente-estado').value = cliente.estado || '';
+                document.getElementById('edit-cliente-cep').value = cliente.cep || '';
+
+                abrirModal('modal-editar-cliente');
+            } catch (error) {
+                console.error('Erro ao carregar cliente:', error);
+            }
+        }
+
+        document.getElementById('form-editar-cliente').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const clienteAtualizado = {
+                nome: document.getElementById('edit-cliente-nome').value,
+                email: document.getElementById('edit-cliente-email').value,
+                telefone: document.getElementById('edit-cliente-telefone').value,
+                endereco: document.getElementById('edit-cliente-endereco').value,
+                cidade: document.getElementById('edit-cliente-cidade').value,
+                estado: document.getElementById('edit-cliente-estado').value,
+                cep: document.getElementById('edit-cliente-cep').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/clientes/${clienteEmEdicao}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(clienteAtualizado)
+                });
+
+                if (response.ok) {
+                    mostrarAlerta('✓ Cliente atualizado com sucesso!', 'success', 'alert-cliente');
+                    fecharModal('modal-editar-cliente');
+                    carregarClientes();
+                }
+            } catch (error) {
+                mostrarAlerta('✗ Erro ao atualizar cliente', 'error', 'alert-cliente');
+            }
+        });
+
+        async function deletarCliente(id) {
+            if (confirm('Tem certeza que deseja deletar este cliente?')) {
+                try {
+                    const response = await fetch(`${API_URL}/clientes/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        mostrarAlerta('✓ Cliente deletado com sucesso!', 'success', 'alert-cliente');
+                        carregarClientes();
+                        carregarDashboard();
+                    }
+                } catch (error) {
+                    mostrarAlerta('✗ Erro ao deletar cliente', 'error', 'alert-cliente');
+                }
+            }
+        }
+
+        // ========== PRODUTOS ==========
+        async function carregarCategoriasProduto() {
+            try {
+                const response = await fetch(`${API_URL}/categorias`);
+                const categorias = await response.json();
+                const select = document.getElementById('produto-categoria');
+
+                select.innerHTML = '<option value="">Selecionar categoria...</option>';
+                categorias.forEach(cat => {
+                    select.innerHTML += `<option value="${cat.id}">${cat.nome}</option>`;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar categorias:', error);
+            }
+        }
+
+        async function carregarProdutos() {
+            try {
+                const response = await fetch(`${API_URL}/produtos`);
+                const produtos = await response.json();
+                const tbody = document.querySelector('#tabela-produtos tbody');
+
+                if (produtos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Nenhum produto cadastrado</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = produtos.map(produto => `
+                    <tr>
+                        <td>${produto.id}</td>
+                        <td>${produto.nome}</td>
+                        <td>${produto.categoria_nome}</td>
+                        <td>R$ ${parseFloat(produto.preco).toFixed(2)}</td>
+                        <td>${produto.quantidade_estoque}</td>
+                        <td>${new Date(produto.data_criacao).toLocaleDateString('pt-BR')}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editarProduto(${produto.id})">✏️ Editar</button>
+                            <button class="btn-danger" onclick="deletarProduto(${produto.id})">🗑️ Deletar</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+            }
+        }
+
+        document.getElementById('form-produto').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const produto = {
+                nome: document.getElementById('produto-nome').value,
+                descricao: document.getElementById('produto-descricao').value,
+                preco: parseFloat(document.getElementById('produto-preco').value),
+                quantidade_estoque: parseInt(document.getElementById('produto-estoque').value),
+                categoria_id: parseInt(document.getElementById('produto-categoria').value)
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/produtos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(produto)
+                });
+
+                if (response.ok) {
+                    mostrarAlerta('✓ Produto adicionado com sucesso!', 'success', 'alert-produto');
+                    document.getElementById('form-produto').reset();
+                    carregarProdutos();
+                    carregarDashboard();
+                } else {
+                    mostrarAlerta('✗ Erro ao adicionar produto', 'error', 'alert-produto');
+                }
+            } catch (error) {
+                mostrarAlerta('✗ Erro ao conectar com servidor', 'error', 'alert-produto');
+            }
+        });
+
+        function editarProduto(id) {
+            alert('Função de edição de produtos em desenvolvimento');
+        }
+
+        async function deletarProduto(id) {
+            if (confirm('Tem certeza que deseja deletar este produto?')) {
+                try {
+                    const response = await fetch(`${API_URL}/produtos/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        mostrarAlerta('✓ Produto deletado com sucesso!', 'success', 'alert-produto');
+                        carregarProdutos();
+                        carregarDashboard();
+                    } else {
+                        mostrarAlerta('✗ Erro ao deletar produto', 'error', 'alert-produto');
+                    }
+                } catch (error) {
+                    mostrarAlerta('✗ Erro ao deletar produto', 'error', 'alert-produto');
+                }
+            }
+        }
+
+        // ========== CATEGORIAS ==========
+        async function carregarCategorias() {
+            try {
+                const response = await fetch(`${API_URL}/categorias`);
+                const categorias = await response.json();
+                const tbody = document.querySelector('#tabela-categorias tbody');
+
+                if (categorias.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhuma categoria cadastrada</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = categorias.map(categoria => `
+                    <tr>
+                        <td>${categoria.id}</td>
+                        <td>${categoria.nome}</td>
+                        <td>${categoria.descricao || 'N/A'}</td>
+                        <td>${new Date(categoria.data_criacao).toLocaleDateString('pt-BR')}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editarCategoria(${categoria.id})">✏️ Editar</button>
+                            <button class="btn-danger" onclick="deletarCategoria(${categoria.id})">🗑️ Deletar</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Erro ao carregar categorias:', error);
+            }
+        }
+
+        document.getElementById('form-categoria').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const categoria = {
+                nome: document.getElementById('categoria-nome').value,
+                descricao: document.getElementById('categoria-descricao').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/categorias`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(categoria)
+                });
+
+                if (response.ok) {
+                    mostrarAlerta('✓ Categoria adicionada com sucesso!', 'success', 'alert-categoria');
+                    document.getElementById('form-categoria').reset();
+                    carregarCategorias();
+                    carregarCategoriasProduto();
+                } else {
+                    mostrarAlerta('✗ Erro ao adicionar categoria', 'error', 'alert-categoria');
+                }
+            } catch (error) {
+                mostrarAlerta('✗ Erro ao conectar com servidor', 'error', 'alert-categoria');
+            }
+        });
+
+        function editarCategoria(id) {
+            alert('Função de edição de categorias em desenvolvimento');
+        }
+
+        async function deletarCategoria(id) {
+            if (confirm('Tem certeza que deseja deletar esta categoria?')) {
+                try {
+                    const response = await fetch(`${API_URL}/categorias/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        mostrarAlerta('✓ Categoria deletada com sucesso!', 'success', 'alert-categoria');
+                        carregarCategorias();
+                        carregarCategoriasProduto();
+                    } else {
+                        mostrarAlerta('✗ Erro ao deletar categoria', 'error', 'alert-categoria');
+                    }
+                } catch (error) {
+                    mostrarAlerta('✗ Erro ao deletar categoria', 'error', 'alert-categoria');
+                }
+            }
+        }
+
+        // ========== PEDIDOS ==========
+        async function carregarPedidos() {
+            try {
+                const response = await fetch(`${API_URL}/pedidos`);
+                const pedidos = await response.json();
+                const tbody = document.querySelector('#tabela-pedidos tbody');
+
+                if (pedidos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Nenhum pedido cadastrado</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = pedidos.map(pedido => `
+                    <tr>
+                        <td>${pedido.id}</td>
+                        <td>${pedido.cliente_nome}</td>
+                        <td>${new Date(pedido.data_pedido).toLocaleDateString('pt-BR')}</td>
+                        <td><span class="status-badge status-${pedido.status.toLowerCase()}">${pedido.status}</span></td>
+                        <td>R$ ${pedido.valor_total ? parseFloat(pedido.valor_total).toFixed(2) : '0.00'}</td>
+                        <td>
+                            <button class="btn-secondary" onclick="verPedido(${pedido.id})">👁️ Ver Detalhes</button>
+                            <button class="btn-danger" onclick="deletarPedido(${pedido.id})">🗑️ Deletar</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Erro ao carregar pedidos:', error);
+            }
+        }
+
+        async function carregarClientesPedido() {
+            try {
+                const response = await fetch(`${API_URL}/clientes`);
+                const clientes = await response.json();
+                const select = document.getElementById('pedido-cliente');
+
+                select.innerHTML = '<option value="">Selecionar cliente...</option>';
+                clientes.forEach(cli => {
+                    select.innerHTML += `<option value="${cli.id}">${cli.nome}</option>`;
+                });
+            } catch (error) {
+                console.error('Erro ao carregar clientes:', error);
+            }
+        }
+
+        document.getElementById('form-pedido').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const pedido = {
+                cliente_id: parseInt(document.getElementById('pedido-cliente').value),
+                status: document.getElementById('pedido-status').value,
+                observacoes: document.getElementById('pedido-observacoes').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/pedidos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(pedido)
+                });
+
+                if (response.ok) {
+                    mostrarAlerta('✓ Pedido criado com sucesso!', 'success', 'alert-pedido');
+                    document.getElementById('form-pedido').reset();
+                    carregarPedidos();
+                    carregarDashboard();
+                } else {
+                    mostrarAlerta('✗ Erro ao criar pedido', 'error', 'alert-pedido');
+                }
+            } catch (error) {
+                mostrarAlerta('✗ Erro ao conectar com servidor', 'error', 'alert-pedido');
+            }
+        });
+
+        async function verPedido(id) {
+            try {
+                const pedidoResp = await fetch(`${API_URL}/pedidos/${id}`);
+                const pedido = await pedidoResp.json();
+
+                const itensResp = await fetch(`${API_URL}/pedidos/${id}/itens`);
+                const itens = await itensResp.json();
+
+                let htmlItens = '';
+                if (itens.length > 0) {
+                    htmlItens = itens.map(item => `
+                        <tr>
+                            <td>${item.nome}</td>
+                            <td>${item.quantidade}</td>
+                            <td>R$ ${parseFloat(item.preco_unitario).toFixed(2)}</td>
+                            <td>R$ ${parseFloat(item.subtotal).toFixed(2)}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    htmlItens = '<tr><td colspan="4" class="empty-state">Nenhum item neste pedido</td></tr>';
+                }
+
+                const content = `
+                    <div>
+                        <p><strong>ID do Pedido:</strong> ${pedido.id}</p>
+                        <p><strong>Cliente:</strong> ${pedido.cliente_nome}</p>
+                        <p><strong>Data:</strong> ${new Date(pedido.data_pedido).toLocaleDateString('pt-BR')}</p>
+                        <p><strong>Status:</strong> <span class="status-badge status-${pedido.status.toLowerCase()}">${pedido.status}</span></p>
+                        <p><strong>Observações:</strong> ${pedido.observacoes || 'N/A'}</p>
+                        
+                        <h4 style="margin-top: 20px; color: #FFD700;">Itens do Pedido</h4>
+                        <table style="width: 100%; margin-top: 10px;">
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Quantidade</th>
+                                    <th>Preço Unitário</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${htmlItens}
+                            </tbody>
+                        </table>
+                        <p style="margin-top: 20px; font-size: 1.2em;"><strong>Valor Total: R$ ${pedido.valor_total ? parseFloat(pedido.valor_total).toFixed(2) : '0.00'}</strong></p>
+                    </div>
+                `;
+
+                document.getElementById('detalhes-pedido-content').innerHTML = content;
+                abrirModal('modal-detalhes-pedido');
+            } catch (error) {
+                console.error('Erro ao carregar detalhes do pedido:', error);
+                mostrarAlerta('✗ Erro ao carregar detalhes', 'error', 'alert-pedido');
+            }
+        }
+
+        async function deletarPedido(id) {
+            if (confirm('Tem certeza que deseja deletar este pedido?')) {
+                try {
+                    const response = await fetch(`${API_URL}/pedidos/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        mostrarAlerta('✓ Pedido deletado com sucesso!', 'success', 'alert-pedido');
+                        carregarPedidos();
+                        carregarDashboard();
+                    }
+                } catch (error) {
+                    mostrarAlerta('✗ Erro ao deletar pedido', 'error', 'alert-pedido');
+                }
+            }
+        }
+
+        // ========== RELATÓRIOS ==========
+        async function gerarRelatorioEstoque() {
+            try {
+                const response = await fetch(`${API_URL}/relatorios/estoque`);
+                const dados = await response.json();
+                const tbody = document.querySelector('#tabela-relatorio-estoque tbody');
+                const tabela = document.getElementById('tabela-relatorio-estoque');
+
+                tbody.innerHTML = dados.map(item => `
+                    <tr>
+                        <td>${item.nome}</td>
+                        <td>${item.categoria}</td>
+                        <td>${item.quantidade_estoque}</td>
+                    </tr>
+                `).join('');
+
+                tabela.style.display = 'table';
+            } catch (error) {
+                console.error('Erro ao gerar relatório:', error);
+                mostrarAlerta('✗ Erro ao gerar relatório', 'error', 'alert-relatorio');
+            }
+        }
+
+        async function gerarRelatorioVendas() {
+            try {
+                const response = await fetch(`${API_URL}/relatorios/vendas`);
+                const dados = await response.json();
+                const tbody = document.querySelector('#tabela-relatorio-vendas tbody');
+                const tabela = document.getElementById('tabela-relatorio-vendas');
+
+                tbody.innerHTML = dados.map(item => `
+                    <tr>
+                        <td>${item.data ? new Date(item.data).toLocaleDateString('pt-BR') : 'N/A'}</td>
+                        <td>${item.total_pedidos}</td>
+                        <td>R$ ${item.valor_total ? parseFloat(item.valor_total).toFixed(2) : '0.00'}</td>
+                    </tr>
+                `).join('');
+
+                tabela.style.display = 'table';
+            } catch (error) {
+                console.error('Erro ao gerar relatório:', error);
+                mostrarAlerta('✗ Erro ao gerar relatório', 'error', 'alert-relatorio');
+            }
+        }
+
+        // Carregar dados iniciais
+        window.addEventListener('load', () => {
+            carregarDashboard();
+            carregarCategoriasProduto();
+            carregarClientesPedido();
+        });
+    </script>
+</body>
+</html>
